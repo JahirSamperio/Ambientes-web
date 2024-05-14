@@ -1,6 +1,23 @@
+import jwt from 'jsonwebtoken';
+
 const home = async (req, res) => {
     try {
-        res.render('PaginaCursos');
+        const {_token} = req.cookies;
+
+        let tokenId;
+        let autenticado;
+        if(_token){
+            autenticado=true;
+            const token = jwt.verify(_token, process.env.JWT_SECRET);
+            tokenId = token.id;
+        } else {
+            autenticado=false
+        }
+        
+        res.render('PaginaCursos', {
+            autenticado: autenticado
+        });
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({

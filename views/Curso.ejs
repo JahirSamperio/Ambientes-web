@@ -27,8 +27,14 @@
               </ul>
             </li>
             <li><a href="#">Certificados</a></li>
-            <li><a href="http://localhost:8080/registro">Acceder</a></li>
-            <li><a href="http://localhost:8080/registro">Crear cuenta</a></li>
+            <% if (autenticado) { %>
+              <form action="http://localhost:8080/signout" method="post">
+                  <button type="submit" class="login-button" style="background-color: transparent; padding: 10px; color: white; font-weight: bold;">Cerrar sesión</button>
+                </form>
+                <% } else { %>
+                  <li><a href="http://localhost:8080/registro">Acceder</a></li>
+                  <li><a href="http://localhost:8080/registro">Crear cuenta</a></li>
+                  <% } %>
           </ul>
         </nav>
     </header>
