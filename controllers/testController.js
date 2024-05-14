@@ -7,23 +7,35 @@ const presentarEvaluacion = async (req, res) => {
     try {
         const { id_leccion } = req.params;
 
-        // const leccion = await profileLeccion(id_leccion);
+        //Buscar leccion
         const leccion = await Leccion.findOne({ where: { id_leccion } });
-        console.log(leccion)
 
         //Crear JOIN
-        const cuestionario = await test(id_leccion);
-        
-        const evaluacion = Array.isArray(cuestionario) ? cuestionario[0] : cuestionario;
-        // console.log(evaluacion);
+        const evaluacion = await Leccion.findOne({
+            where: { id_leccion },
+            include: {
+                model: Pregunta,
+                include: {
+                    model: Opcion
+                }
+            }
+        })
 
-        // res.render('Cuestionario', {
-        //     leccion: leccion,
-        //     evaluacion: evaluacion
-        // })
-        res.status(200).json ({
+        // Extraer atributos de opciones por pregunta
+        const opcionesPorPregunta = evaluacion.pregunta.map(pregunta => {
+            // Extraer atributos de cada opción de la pregunta
+            const opciones = pregunta.opciones.map((opcion, index) => {
+                const opcionJSON = opcion.toJSON();
+                opcionJSON.index = index; // Agregar el índice al objeto JSON de la opción
+                return opcionJSON;
+            });
+            return opciones;
+        });
+
+        res.render('Cuestionario', {
             leccion: leccion,
-            evaluacion: cuestionario
+            preguntas: evaluacion.pregunta,
+            opciones: opcionesPorPregunta
         })
     } catch (error) {
         console.log(error);
@@ -33,6 +45,94 @@ const presentarEvaluacion = async (req, res) => {
     }
 }
 
+const calcularResultado = async (req, res) => {
+    try {
+        const respuestas = req.body;
+        
+        //Lo convierte en arreglo
+        const arrayRespuestas = Object.entries(respuestas);
+        
+        //Recuperar id de la leccion del input
+        const id_leccion = arrayRespuestas[arrayRespuestas.length - 1 ][1];
+
+        //Buscar leccion
+        const leccion = await Leccion.findOne({ where: { id_leccion } });
+
+        //Eliminar id del body de respuestas
+        arrayRespuestas.pop();
+
+        let respuestasCorrectas = [];
+
+        for(let i=0; i<arrayRespuestas.length; i++){
+            //id del body enviado
+            const id_pregunta = arrayRespuestas[i][0];            
+            
+            //Busca respuesta correcta de acuerdo al id
+            const es_correcta = await Opcion.findOne({
+                where: {
+                    id_pregunta,
+                    es_correcta: true
+                },
+                attributes: ['id_opcion']
+            })
+            respuestasCorrectas.push([id_pregunta, '' + es_correcta.id_opcion]);
+
+
+        }
+
+        
+        //Calificacion
+        let puntuacion = 0;
+
+        for(let i = 0; i<arrayRespuestas.length; i++){
+            if(arrayRespuestas[i][1] === respuestasCorrectas[i][1] ){
+                puntuacion += 1;
+            }
+        }
+
+        const calificacion = ((puntuacion * 10) / arrayRespuestas.length).toFixed(2);
+
+        console.log(calificacion);
+
+        //Crear JOIN de respuestas correctas
+        const evaluacion = await Leccion.findOne({
+            where: { id_leccion },
+            include: {
+                model: Pregunta,
+                include: {
+                    model: Opcion,
+                    where: { es_correcta: true }
+                }
+            }
+        })
+
+        // Extraer atributos de opciones por pregunta
+        const opcionesPorPregunta = evaluacion.pregunta.map(pregunta => {
+            // Extraer atributos de cada opción de la pregunta
+            const opciones = pregunta.opciones.map((opcion, index) => {
+                const opcionJSON = opcion.toJSON();
+                opcionJSON.index = index; // Agregar el índice al objeto JSON de la opción
+                return opcionJSON;
+            });
+            return opciones;
+        });
+
+        
+        return res.render('Calificacion', {
+            calificacion: calificacion,
+            leccion : leccion,
+            preguntas: evaluacion.pregunta,
+            opciones: opcionesPorPregunta
+        })
+
+    } catch (error) {
+        return res.render('alertas', {
+            mensaje: "Error en el servidor:("
+        });
+    }
+}
+
 export {
-    presentarEvaluacion
+    presentarEvaluacion,
+    calcularResultado
 }
