@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso</title>
+    <link rel="stylesheet" href="../css/styleC.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+          <img src="../img/logo.png" alt="Learn Connect">
+        </div>
+        <nav>
+          <ul class="nav-menu">
+            <li><a href="http://localhost:8080/#">Cursos</a></li>
+            <li><input type="text" placeholder="Buscar curso"></li>
+            <li class="nav-right">
+              <a href="#">Sobre nosotros</a>
+              <ul class="submenu">
+                <li><a href="#">Sobre Learn Connect</a></li>
+                <li><a href="http://localhost:8080/historia">Nuestra historia</a></li>
+                <li><a href="#">Campus virtual</a></li>
+                <li><a href="#">Contenidos académicos</a></li>
+                <li><a href="#">Programa de Afiliados</a></li>
+                <li><a href="#">Empleos</a></li>
+              </ul>
+            </li>
+            <li><a href="#">Certificados</a></li>
+            <li><a href="http://localhost:8080/registro">Acceder</a></li>
+            <li><a href="http://localhost:8080/registro">Crear cuenta</a></li>
+          </ul>
+        </nav>
+    </header>
+
+
+    <div class="course-container">
+        <div class="course-info">
+          <h1><%= leccion.nombre %></h1>
+          <P><%= leccion.descripcion %></P>
+          <p>Dominarás el uso de funciones y variables, condicionales, bucles y excepciones.</p>
+          <div class="rating">
+            <span class="stars">★★★★★ </span><p>4.9 opiniones   &nbsp; </p>
+            <span class="free" style="font-weight: bold;">Nivel: <%= leccion.nivel %></span>
+          </div>
+          
+        </div>
+        <div class="course-features">
+          <div class="feature">
+            <i class="fas fa-play-circle"></i>
+            <div class="feature-text">
+              <h3>Modalidad 100% virtual</h3>
+              <p>El contenido está disponible las 24 horas del día para que puedas estudiar en tu propio horario.</p>
+            </div>
+          </div>
+          <div class="feature">
+            <i class="fas fa-certificate"></i>
+            <div class="feature-text">
+              <h3>Certificado internacional</h3>
+              <p>Al finalizar el Curso de programación puedes obtener un certificado de estudios, con validez internacional. <a href="#">Ver más</a></p>
+            </div>
+          </div>
+          <a href="http://localhost:8080/evaluacion/<%= leccion.id_leccion %>" class="butto" style="background-color:dodgerblue;">Evaluacion</a>
+        </div>
+        <div class="course-logo">
+          <img src="../img/logopython.png" alt="Python Logo">
+        </div>  
+    </div>
+
+
+    <div class="course-menu">
+        <h2>Programa del curso</h2>
+        <ul class="menu">
+          <% temario.forEach((tema, index) => { %>
+            <li>
+              <input type="checkbox" id="menu-item-1" class="menu-toggle">
+              <label for="menu-item-1" class="menu-item">
+                <span class="arrow">&#9658;</span>
+                    <%= tema.titulo %>
+                </label>
+            </li>
+        <% }); %>
+          <!-- Resto de elementos del menú -->
+        </ul>
+      </div>
+
+      <div class="course-container2">
+        <div class="course-info">
+        <h1>Qué aprenderás</h1>
+          <% temario.forEach((tema, index) => { %>
+            <strong><%= tema.titulo %>:</strong> <%= tema.descripcion %>
+            <br>
+            <br>
+          <% }); %>
+        </div>
+        
+    </div>
+
+
+</body>
+</html>
